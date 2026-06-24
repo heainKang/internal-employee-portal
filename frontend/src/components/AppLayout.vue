@@ -11,6 +11,7 @@
         <template v-if="auth.isAdmin">
           <router-link to="/admin/employees" class="nav-link">직원 목록</router-link>
           <router-link to="/admin/employees/create" class="nav-link">직원 생성</router-link>
+          <router-link to="/admin/background-checks" class="nav-link">배경 조회</router-link>
         </template>
         <router-link to="/me" class="nav-link">내 정보</router-link>
       </nav>

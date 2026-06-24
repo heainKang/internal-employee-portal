@@ -7,6 +7,7 @@ const routes = [
   { path: '/admin/employees', component: () => import('../views/admin/EmployeeListView.vue'), meta: { admin: true } },
   { path: '/admin/employees/create', component: () => import('../views/admin/EmployeeCreateView.vue'), meta: { admin: true } },
   { path: '/admin/employees/:id', component: () => import('../views/admin/EmployeeDetailView.vue'), meta: { admin: true } },
+  { path: '/admin/background-checks', component: () => import('../views/admin/BackgroundCheckView.vue'), meta: { admin: true } },
   { path: '/:pathMatch(.*)*', redirect: '/login' }
 ]
 
