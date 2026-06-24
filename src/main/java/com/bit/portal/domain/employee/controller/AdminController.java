@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 @Tag(name = "관리자 — 직원 관리", description = "직원 계정 생성, 목록 조회, 상태 변경 (ROLE_ADMIN 전용)")
 @RestController
@@ -31,10 +31,15 @@ public class AdminController {
                 .body(ApiResponse.of(response, "직원 계정이 생성되었습니다."));
     }
 
-    @Operation(summary = "전체 직원 목록 조회")
+    @Operation(summary = "전체 직원 목록 조회 (페이지네이션·정렬)",
+            description = "sortBy: id·firstName·department·hireDate·createdAt / direction: asc·desc")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<EmployeeResponse>>> getAllEmployees() {
-        List<EmployeeResponse> response = employeeService.getAllEmployees();
+    public ResponseEntity<ApiResponse<Page<EmployeeResponse>>> getAllEmployees(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction) {
+        Page<EmployeeResponse> response = employeeService.getAllEmployees(page, size, sortBy, direction);
         return ResponseEntity.ok(ApiResponse.of(response));
     }
 

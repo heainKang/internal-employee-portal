@@ -21,20 +21,32 @@ public class AuthService {
     private final EmployeeRepository employeeRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final LoginAttemptService loginAttemptService;
 
     public LoginResponse login(LoginRequest request) {
-        Employee employee = employeeRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new BusinessException(ErrorCode.UNAUTHORIZED));
+        String email = request.getEmail();
+
+        if (loginAttemptService.isLocked(email)) {
+            throw new BusinessException(ErrorCode.LOGIN_RATE_LIMIT);
+        }
+
+        Employee employee = employeeRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                    loginAttemptService.loginFailed(email);
+                    return new BusinessException(ErrorCode.UNAUTHORIZED);
+                });
 
         if (!passwordEncoder.matches(request.getPassword(), employee.getPassword())) {
+            loginAttemptService.loginFailed(email);
             throw new BusinessException(ErrorCode.UNAUTHORIZED);
         }
 
-        // 퇴사자 로그인 차단 — 실패 원인 노출 없이 401 통일
         if (employee.getStatus() == EmployeeStatus.RESIGNED) {
+            loginAttemptService.loginFailed(email);
             throw new BusinessException(ErrorCode.UNAUTHORIZED);
         }
 
+        loginAttemptService.loginSucceeded(email);
         String token = jwtTokenProvider.generateToken(employee);
         return LoginResponse.of(token, employee);
     }

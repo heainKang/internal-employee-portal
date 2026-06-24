@@ -7,12 +7,15 @@ import com.bit.portal.domain.employee.repository.EmployeeRepository;
 import com.bit.portal.global.error.code.ErrorCode;
 import com.bit.portal.global.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -47,23 +50,31 @@ public class EmployeeService {
         return EmployeeResponse.from(employeeRepository.save(employee));
     }
 
-    // ── Admin: 직원 목록/상세 ─────────────────────────────────────────────────
+    // ── Admin: 직원 목록 (페이지네이션 + 정렬) ────────────────────────────────
 
-    public List<EmployeeResponse> getAllEmployees() {
-        return employeeRepository.findAll().stream()
-                .map(EmployeeResponse::from)
-                .toList();
+    public Page<EmployeeResponse> getAllEmployees(int page, int size, String sortBy, String direction) {
+        Sort sort = direction.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return employeeRepository.findAll(pageable).map(EmployeeResponse::from);
     }
+
+    // ── Admin: 직원 상세 ──────────────────────────────────────────────────────
 
     public EmployeeResponse getEmployee(Long id) {
         return EmployeeResponse.from(findById(id));
     }
 
-    // ── Admin: 상태 변경 (퇴사 처리) ──────────────────────────────────────────
+    // ── Admin: 상태 변경 (퇴사 처리만 허용) ──────────────────────────────────
 
     @Transactional
     public EmployeeResponse updateStatus(Long id, EmployeeStatusUpdateRequest request) {
         Employee employee = findById(id);
+
+        if (employee.getStatus() == EmployeeStatus.RESIGNED) {
+            throw new BusinessException(ErrorCode.ALREADY_RESIGNED);
+        }
 
         if (request.getStatus() == EmployeeStatus.RESIGNED) {
             employee.resign();
@@ -81,7 +92,7 @@ public class EmployeeService {
     @Transactional
     public EmployeeResponse updateMyProfile(String email, EmployeeUpdateRequest request) {
         Employee employee = findByEmail(email);
-        employee.updateProfile(request.getPhone(), request.getEmail());
+        employee.updateProfile(request.getPhone());
         return EmployeeResponse.from(employee);
     }
 
@@ -119,8 +130,11 @@ public class EmployeeService {
 
     private String generateEmployeeId() {
         int year = LocalDate.now().getYear();
-        String prefix = "EMP-" + year;
-        long count = employeeRepository.countByEmployeeIdStartingWith(prefix);
-        return String.format("%s-%03d", prefix, count + 1);
+        String prefix = "EMP-" + year + "-";
+        // MAX 방식: 삭제 후 재생성 시 중복 없음, count 방식 대비 안전
+        int next = employeeRepository.findMaxEmployeeIdByPrefix(prefix)
+                .map(maxId -> Integer.parseInt(maxId.substring(prefix.length())) + 1)
+                .orElse(1);
+        return String.format("EMP-%d-%03d", year, next);
     }
 }

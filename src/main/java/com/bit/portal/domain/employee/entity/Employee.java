@@ -104,10 +104,9 @@ public class Employee {
         this.tokenVersion++;
     }
 
-    /** 직원 본인 수정 가능 필드 */
-    public void updateProfile(String phone, String email) {
+    /** 직원 본인 수정 가능 필드 — 이메일은 변경 불가 */
+    public void updateProfile(String phone) {
         if (phone != null && !phone.isBlank()) this.phone = phone;
-        if (email != null && !email.isBlank()) this.email = email;
     }
 
     /** 관리자 수정 가능 필드 */

@@ -49,10 +49,6 @@
           <h3 class="text-sm font-semibold text-gray-700 mb-4">정보 수정</h3>
           <form @submit.prevent="handleUpdate" class="space-y-4">
             <div>
-              <label class="label">이메일</label>
-              <input v-model="form.email" type="email" class="input" />
-            </div>
-            <div>
               <label class="label">전화번호</label>
               <input v-model="form.phone" type="text" placeholder="010-0000-0000" class="input" />
             </div>
@@ -82,13 +78,12 @@ const loading = ref(true)
 const saving = ref(false)
 const successMsg = ref('')
 const errorMsg = ref('')
-const form = ref({ email: '', phone: '' })
+const form = ref({ phone: '' })
 
 onMounted(async () => {
   try {
     const res = await api.get('/me')
     profile.value = res.data.data
-    form.value.email = profile.value.email
     form.value.phone = profile.value.phone || ''
   } finally {
     loading.value = false

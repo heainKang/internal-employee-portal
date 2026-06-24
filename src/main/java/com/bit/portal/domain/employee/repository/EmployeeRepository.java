@@ -13,5 +13,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
     boolean existsByEmail(String email);
 
-    long countByEmployeeIdStartingWith(String prefix);
+    @org.springframework.data.jpa.repository.Query(
+        "SELECT MAX(e.employeeId) FROM Employee e WHERE e.employeeId LIKE CONCAT(:prefix, '%')"
+    )
+    java.util.Optional<String> findMaxEmployeeIdByPrefix(@org.springframework.data.repository.query.Param("prefix") String prefix);
 }
