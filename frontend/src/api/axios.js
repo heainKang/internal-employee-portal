@@ -11,9 +11,11 @@ api.interceptors.request.use(config => {
 api.interceptors.response.use(
   res => res,
   err => {
-    if (err.response?.status === 401) {
+    const isLoginRequest = err.config?.url?.includes('/auth/login')
+    if (err.response?.status === 401 && !isLoginRequest) {
       localStorage.removeItem('token')
       localStorage.removeItem('user')
+      sessionStorage.setItem('sessionExpired', '1')
       window.location.href = '/login'
     }
     return Promise.reject(err)
