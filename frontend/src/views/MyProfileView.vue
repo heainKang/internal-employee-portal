@@ -8,6 +8,7 @@
       <template v-else-if="profile">
         <!-- 기본 정보 카드 -->
         <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+          <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">기본 정보</h3>
           <div class="grid grid-cols-2 gap-4 text-sm">
             <div>
               <p class="text-gray-500 mb-0.5">사번</p>
@@ -38,8 +39,39 @@
               <p class="font-medium text-gray-900">{{ profile.position || '-' }}</p>
             </div>
             <div>
+              <p class="text-gray-500 mb-0.5">이메일</p>
+              <p class="font-medium text-gray-900">{{ profile.email }}</p>
+            </div>
+            <div>
               <p class="text-gray-500 mb-0.5">입사일</p>
               <p class="font-medium text-gray-900">{{ profile.hireDate || '-' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 개인 연락처 카드 -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+          <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">개인 연락처</h3>
+          <div class="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <p class="text-gray-500 mb-0.5">전화번호</p>
+              <p class="font-medium text-gray-900">{{ profile.phone || '-' }}</p>
+            </div>
+            <div>
+              <p class="text-gray-500 mb-0.5">주소</p>
+              <p class="font-medium text-gray-900">{{ profile.address || '-' }}</p>
+            </div>
+            <div>
+              <p class="text-gray-500 mb-0.5">비상연락처 이름</p>
+              <p class="font-medium text-gray-900">{{ profile.emergencyContactName || '-' }}</p>
+            </div>
+            <div>
+              <p class="text-gray-500 mb-0.5">비상연락처 전화번호</p>
+              <p class="font-medium text-gray-900">{{ profile.emergencyContactPhone || '-' }}</p>
+            </div>
+            <div class="col-span-2">
+              <p class="text-gray-500 mb-0.5">메모</p>
+              <p class="font-medium text-gray-900 whitespace-pre-wrap">{{ profile.note || '-' }}</p>
             </div>
           </div>
         </div>
@@ -48,9 +80,33 @@
         <div class="bg-white rounded-xl border border-gray-200 p-6">
           <h3 class="text-sm font-semibold text-gray-700 mb-4">정보 수정</h3>
           <form @submit.prevent="handleUpdate" class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="label">전화번호</label>
+                <input v-model="form.phone" type="text" placeholder="010-0000-0000" class="input" />
+              </div>
+              <div>
+                <label class="label">주소</label>
+                <input v-model="form.address" type="text" placeholder="서울시 강남구..." class="input" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="label">비상연락처 이름</label>
+                <input v-model="form.emergencyContactName" type="text" placeholder="홍길동" class="input" />
+              </div>
+              <div>
+                <label class="label">비상연락처 전화번호</label>
+                <input v-model="form.emergencyContactPhone" type="text" placeholder="010-0000-0000" class="input" />
+              </div>
+            </div>
+
             <div>
-              <label class="label">전화번호</label>
-              <input v-model="form.phone" type="text" placeholder="010-0000-0000" class="input" />
+              <label class="label">메모</label>
+              <textarea v-model="form.note" rows="3"
+                placeholder="자기소개, 특이사항 등 자유롭게 작성하세요."
+                class="input resize-none" />
             </div>
 
             <div class="flex items-center gap-3">
@@ -78,13 +134,22 @@ const loading = ref(true)
 const saving = ref(false)
 const successMsg = ref('')
 const errorMsg = ref('')
-const form = ref({ phone: '' })
+const form = ref({
+  phone: '', address: '', emergencyContactName: '', emergencyContactPhone: '', note: ''
+})
 
 onMounted(async () => {
   try {
     const res = await api.get('/me')
     profile.value = res.data.data
-    form.value.phone = profile.value.phone || ''
+    const p = profile.value
+    form.value = {
+      phone: p.phone || '',
+      address: p.address || '',
+      emergencyContactName: p.emergencyContactName || '',
+      emergencyContactPhone: p.emergencyContactPhone || '',
+      note: p.note || ''
+    }
   } finally {
     loading.value = false
   }
@@ -98,8 +163,11 @@ async function handleUpdate() {
     const res = await api.patch('/me', form.value)
     profile.value = res.data.data
     successMsg.value = '저장되었습니다.'
-  } catch {
-    errorMsg.value = '저장에 실패했습니다.'
+  } catch (err) {
+    const fields = err.response?.data?.errors
+    errorMsg.value = fields?.length
+      ? fields.map(f => f.message).join(' / ')
+      : (err.response?.data?.message || '저장에 실패했습니다.')
   } finally {
     saving.value = false
   }

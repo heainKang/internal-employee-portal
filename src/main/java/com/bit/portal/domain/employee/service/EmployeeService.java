@@ -101,7 +101,13 @@ public class EmployeeService {
     @Transactional
     public EmployeeResponse updateMyProfile(String email, EmployeeUpdateRequest request) {
         Employee employee = findByEmail(email);
-        employee.updateProfile(request.getPhone());
+        employee.updateProfile(
+                request.getPhone(),
+                request.getAddress(),
+                request.getEmergencyContactName(),
+                request.getEmergencyContactPhone(),
+                request.getNote()
+        );
         return EmployeeResponse.from(employee);
     }
 

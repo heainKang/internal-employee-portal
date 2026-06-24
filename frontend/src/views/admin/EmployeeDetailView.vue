@@ -52,6 +52,27 @@
               <p class="font-medium text-gray-900">{{ employee.hireDate || '-' }}</p>
             </div>
           </div>
+
+          <!-- 개인 연락처 (직원이 등록한 정보) -->
+          <div class="mt-4 pt-4 border-t border-gray-100 grid grid-cols-2 gap-3 text-sm">
+            <p class="col-span-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">개인 연락처</p>
+            <div>
+              <p class="text-gray-500">주소</p>
+              <p class="font-medium text-gray-900">{{ employee.address || '-' }}</p>
+            </div>
+            <div>
+              <p class="text-gray-500">비상연락처 이름</p>
+              <p class="font-medium text-gray-900">{{ employee.emergencyContactName || '-' }}</p>
+            </div>
+            <div>
+              <p class="text-gray-500">비상연락처 전화번호</p>
+              <p class="font-medium text-gray-900">{{ employee.emergencyContactPhone || '-' }}</p>
+            </div>
+            <div>
+              <p class="text-gray-500">메모</p>
+              <p class="font-medium text-gray-900 whitespace-pre-wrap">{{ employee.note || '-' }}</p>
+            </div>
+          </div>
         </div>
 
         <!-- 관리자 수정 폼 -->

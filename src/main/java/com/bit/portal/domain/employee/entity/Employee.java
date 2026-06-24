@@ -42,6 +42,18 @@ public class Employee {
     @Column(length = 20)
     private String phone;
 
+    @Column(length = 255)
+    private String address;
+
+    @Column(name = "emergency_contact_name", length = 100)
+    private String emergencyContactName;
+
+    @Column(name = "emergency_contact_phone", length = 20)
+    private String emergencyContactPhone;
+
+    @Column(length = 500)
+    private String note;
+
     @Column(length = 100)
     private String department;
 
@@ -104,9 +116,18 @@ public class Employee {
         this.tokenVersion++;
     }
 
-    /** 직원 본인 수정 가능 필드 — 이메일은 변경 불가 */
-    public void updateProfile(String phone) {
-        if (phone != null && !phone.isBlank()) this.phone = phone;
+    /** 직원 본인 수정 가능 필드 — 이메일 변경 불가, 빈 문자열 전송 시 null로 초기화 */
+    public void updateProfile(String phone, String address, String emergencyContactName,
+                              String emergencyContactPhone, String note) {
+        this.phone                = blankToNull(phone);
+        this.address              = blankToNull(address);
+        this.emergencyContactName = blankToNull(emergencyContactName);
+        this.emergencyContactPhone = blankToNull(emergencyContactPhone);
+        this.note                 = blankToNull(note);
+    }
+
+    private static String blankToNull(String v) {
+        return (v != null && !v.isBlank()) ? v : null;
     }
 
     /** 관리자 수정 가능 필드 — 빈 문자열 전송 시 null로 초기화(삭제) */

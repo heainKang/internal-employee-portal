@@ -19,6 +19,10 @@ public class EmployeeResponse {
     private String firstName;
     private String lastName;
     private String phone;
+    private String address;
+    private String emergencyContactName;
+    private String emergencyContactPhone;
+    private String note;
     private String department;
     private String position;
     private LocalDate dateOfBirth;
@@ -36,6 +40,10 @@ public class EmployeeResponse {
                 .firstName(employee.getFirstName())
                 .lastName(employee.getLastName())
                 .phone(employee.getPhone())
+                .address(employee.getAddress())
+                .emergencyContactName(employee.getEmergencyContactName())
+                .emergencyContactPhone(employee.getEmergencyContactPhone())
+                .note(employee.getNote())
                 .department(employee.getDepartment())
                 .position(employee.getPosition())
                 .dateOfBirth(employee.getDateOfBirth())
