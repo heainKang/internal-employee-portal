@@ -1,6 +1,6 @@
 services:
 
-  # ── MSSQL (Azure SQL Edge — Apple Silicon arm64 호환) ─────────────────────
+  # ── MSSQL (Azure SQL Edge — Apple Silicon arm64 네이티브) ─────────────────
   mssql:
     image: mcr.microsoft.com/azure-sql-edge:latest
     environment:
@@ -11,25 +11,24 @@ services:
     volumes:
       - mssql_data:/var/opt/mssql
     healthcheck:
-      test: ["CMD-SHELL",
-             "/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P 'Local_Test1234!' -Q 'SELECT 1' 2>/dev/null || exit 1"]
+      # azure-sql-edge에 sqlcmd 없음 → bash TCP 소켓 체크로 대체
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/localhost/1433' 2>/dev/null"]
       interval: 10s
       timeout: 5s
       retries: 15
       start_period: 30s
 
   # ── DB 초기화 (portal_db 생성) ────────────────────────────────────────────
+  # mssql/server:2022 이미지에 포함된 sqlcmd 사용 (Apple Silicon: Rosetta로 실행)
   db-init:
-    image: mcr.microsoft.com/azure-sql-edge:latest
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
     depends_on:
       mssql:
         condition: service_healthy
-    command: >
-      /bin/bash -c "
-      /opt/mssql-tools/bin/sqlcmd -S mssql,1433 -U SA -P 'Local_Test1234!'
-      -Q \"IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N'portal_db') CREATE DATABASE portal_db\"
-      && echo '✓ portal_db ready'
-      "
+    volumes:
+      - ./deploy/init-db.sh:/init-db.sh:ro
+    entrypoint: ["/bin/bash", "/init-db.sh"]
     restart: "no"
 
   # ── Spring Boot App ───────────────────────────────────────────────────────
@@ -45,7 +44,7 @@ services:
       DB_USERNAME: sa
       DB_PASSWORD: "Local_Test1234!"
       # ── JWT ───────────────────────────────────────────────
-      # 로컬 개발 전용 키 — 프로덕션에서는 절대 이 값 사용 금지
+      # 로컬 개발 전용 키 — 프로덕션에서 절대 사용 금지
       JWT_SECRET_KEY: "local-dev-only-key-minimum-32chars-ok"
       JWT_EXPIRATION: "86400"
       # ── JPA ───────────────────────────────────────────────
