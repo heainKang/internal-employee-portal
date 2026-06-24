@@ -71,8 +71,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleCircuitBreakerOpen(CallNotPermittedException e) {
         log.warn("CircuitBreaker OPEN (safety net): {}", e.getMessage());
         return ResponseEntity
-                .status(ErrorCode.EXTERNAL_API_UNAVAILABLE.getStatus())
-                .body(ErrorResponse.of(ErrorCode.EXTERNAL_API_UNAVAILABLE));
+                .status(ErrorCode.CIRCUIT_BREAKER_OPEN.getStatus())
+                .body(ErrorResponse.of(ErrorCode.CIRCUIT_BREAKER_OPEN));
     }
 
     /** 예상치 못한 모든 예외 */

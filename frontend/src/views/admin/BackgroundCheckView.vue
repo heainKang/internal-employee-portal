@@ -128,7 +128,7 @@ async function requestCheck() {
     const res = await api.post('/admin/background-checks', { employeeId: selectedEmployeeId.value })
     newResult.value = res.data.data
   } catch (err) {
-    requestError.value = err.response?.data?.message || '요청에 실패했습니다.'
+    requestError.value = formatApiError(err, '요청에 실패했습니다.')
   } finally {
     requesting.value = false
   }
@@ -145,7 +145,7 @@ async function fetchHistory() {
     history.value = res.data.data?.checks || []
     historySearched.value = true
   } catch (err) {
-    historyError.value = err.response?.data?.message || '이력 조회에 실패했습니다.'
+    historyError.value = formatApiError(err, '이력 조회에 실패했습니다.')
     historySearched.value = true
   } finally {
     historyLoading.value = false
@@ -158,7 +158,22 @@ async function fetchDetail(checkId) {
     detail.value = res.data.data
   } catch (err) {
     detail.value = null
+    historyError.value = formatApiError(err, '상세 조회에 실패했습니다.')
   }
+}
+
+const ERROR_SUFFIX = {
+  X001: '서비스 불가',
+  X002: '타임아웃',
+  X003: '500 서버 오류',
+  X005: 'CB OPEN',
+}
+
+function formatApiError(err, fallback) {
+  const code = err.response?.data?.code
+  const msg  = err.response?.data?.message || fallback
+  const suffix = ERROR_SUFFIX[code]
+  return suffix ? `${msg} (${suffix})` : msg
 }
 
 function statusLabel(status) {

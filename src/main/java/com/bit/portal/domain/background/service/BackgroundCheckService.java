@@ -89,7 +89,7 @@ public class BackgroundCheckService {
         }
         if (e instanceof CallNotPermittedException) {
             log.warn("[{}] Circuit breaker OPEN — calls not permitted", ctx);
-            throw new ExternalApiException(ErrorCode.EXTERNAL_API_UNAVAILABLE);
+            throw new ExternalApiException(ErrorCode.CIRCUIT_BREAKER_OPEN);
         }
         log.error("[{}] Unexpected fallback exception: {} - {}", ctx, e.getClass().getSimpleName(), e.getMessage());
         throw new ExternalApiException(ErrorCode.EXTERNAL_API_UNAVAILABLE);

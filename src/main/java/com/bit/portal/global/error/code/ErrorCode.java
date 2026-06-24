@@ -26,9 +26,10 @@ public enum ErrorCode {
 
     // ── 외부 API (X) ──────────────────────────────────────────────────────────
     EXTERNAL_API_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, "X001", "외부 서비스를 현재 사용할 수 없습니다. 잠시 후 다시 시도해주세요."),
-    EXTERNAL_API_TIMEOUT(HttpStatus.GATEWAY_TIMEOUT, "X002", "외부 서비스 응답 시간이 초과되었습니다."),
-    EXTERNAL_API_ERROR(HttpStatus.BAD_GATEWAY, "X003", "외부 서비스에서 오류가 발생했습니다."),
-    BACKGROUND_CHECK_NOT_FOUND(HttpStatus.NOT_FOUND, "X004", "배경 조회 결과를 찾을 수 없습니다.");
+    EXTERNAL_API_TIMEOUT(HttpStatus.GATEWAY_TIMEOUT,        "X002", "외부 서비스 응답 시간이 초과되었습니다."),
+    EXTERNAL_API_ERROR(HttpStatus.BAD_GATEWAY,              "X003", "외부 서비스에서 오류가 발생했습니다."),
+    BACKGROUND_CHECK_NOT_FOUND(HttpStatus.NOT_FOUND,        "X004", "배경 조회 결과를 찾을 수 없습니다."),
+    CIRCUIT_BREAKER_OPEN(HttpStatus.SERVICE_UNAVAILABLE,    "X005", "외부 서비스를 현재 사용할 수 없습니다. 잠시 후 다시 시도해주세요.");
 
     private final HttpStatus status;
     private final String code;
