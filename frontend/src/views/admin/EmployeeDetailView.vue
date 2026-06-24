@@ -81,6 +81,7 @@
                 {{ saving ? '저장 중...' : '저장' }}
               </button>
               <p v-if="updateMsg" class="text-sm text-green-600">{{ updateMsg }}</p>
+              <p v-if="updateError" class="text-sm text-red-500">{{ updateError }}</p>
             </div>
           </form>
         </div>
@@ -125,6 +126,7 @@ const saving = ref(false)
 const resigning = ref(false)
 const confirmResign = ref(false)
 const updateMsg = ref('')
+const updateError = ref('')
 const editForm = ref({ department: '', position: '', role: 'ROLE_USER' })
 
 onMounted(async () => {
@@ -144,10 +146,13 @@ onMounted(async () => {
 async function handleUpdate() {
   saving.value = true
   updateMsg.value = ''
+  updateError.value = ''
   try {
     const res = await api.patch(`/admin/employees/${route.params.id}`, editForm.value)
     employee.value = res.data.data
     updateMsg.value = '저장되었습니다.'
+  } catch (err) {
+    updateError.value = err.response?.data?.message || '저장에 실패했습니다.'
   } finally {
     saving.value = false
   }

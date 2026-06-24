@@ -14,14 +14,23 @@
       'md:static md:translate-x-0 md:transition-none md:shrink-0',
       drawerOpen ? 'translate-x-0 shadow-xl' : '-translate-x-full',
     ]">
-      <div class="px-6 py-5 border-b border-gray-200 flex items-center justify-between">
-        <div>
+      <div class="px-5 py-4 border-b border-gray-200 flex items-start justify-between gap-2">
+        <div class="min-w-0">
           <h1 class="text-base font-bold text-gray-800">직원 포털</h1>
-          <p class="text-xs text-gray-500 mt-0.5">{{ auth.user?.firstName }} {{ auth.user?.lastName }}</p>
+          <p class="text-sm font-medium text-gray-800 mt-2 truncate">
+            {{ auth.user?.firstName }} {{ auth.user?.lastName }}
+          </p>
+          <p class="text-xs text-gray-400 truncate mt-0.5">{{ auth.user?.email }}</p>
+          <span :class="auth.isAdmin
+            ? 'bg-blue-100 text-blue-700'
+            : 'bg-gray-100 text-gray-600'"
+            class="inline-block mt-1.5 px-2 py-0.5 text-xs font-medium rounded-full">
+            {{ auth.isAdmin ? '관리자' : '직원' }}
+          </span>
         </div>
         <!-- 모바일 닫기 버튼 -->
         <button @click="drawerOpen = false"
-          class="md:hidden p-1 text-gray-400 hover:text-gray-600 rounded focus:outline-none">
+          class="md:hidden p-1 text-gray-400 hover:text-gray-600 rounded focus:outline-none shrink-0">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>

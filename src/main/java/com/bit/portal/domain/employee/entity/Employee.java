@@ -109,10 +109,10 @@ public class Employee {
         if (phone != null && !phone.isBlank()) this.phone = phone;
     }
 
-    /** 관리자 수정 가능 필드 */
+    /** 관리자 수정 가능 필드 — 빈 문자열 전송 시 null로 초기화(삭제) */
     public void updateByAdmin(String department, String position, Role role) {
-        if (department != null && !department.isBlank()) this.department = department;
-        if (position != null && !position.isBlank()) this.position = position;
+        this.department = (department != null && !department.isBlank()) ? department : null;
+        this.position  = (position  != null && !position.isBlank())  ? position  : null;
         if (role != null) this.role = role;
     }
 }

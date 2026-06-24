@@ -50,6 +50,15 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponse.of(response));
     }
 
+    @Operation(summary = "직원 정보 수정 (부서·직책·권한)")
+    @PatchMapping("/{id}")
+    public ResponseEntity<ApiResponse<EmployeeResponse>> updateEmployee(
+            @PathVariable Long id,
+            @Valid @RequestBody EmployeeAdminUpdateRequest request) {
+        EmployeeResponse response = employeeService.updateEmployee(id, request);
+        return ResponseEntity.ok(ApiResponse.of(response, "직원 정보가 수정되었습니다."));
+    }
+
     @Operation(summary = "직원 상태 변경 (퇴사 처리 포함)",
             description = "status: RESIGNED 설정 시 즉시 계정 차단 및 기존 토큰 무효화")
     @PatchMapping("/{id}/status")

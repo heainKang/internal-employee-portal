@@ -66,6 +66,15 @@ public class EmployeeService {
         return EmployeeResponse.from(findById(id));
     }
 
+    // ── Admin: 직원 정보 수정 (부서·직책·권한) ────────────────────────────────
+
+    @Transactional
+    public EmployeeResponse updateEmployee(Long id, EmployeeAdminUpdateRequest request) {
+        Employee employee = findById(id);
+        employee.updateByAdmin(request.getDepartment(), request.getPosition(), request.getRole());
+        return EmployeeResponse.from(employee);
+    }
+
     // ── Admin: 상태 변경 (퇴사 처리만 허용) ──────────────────────────────────
 
     @Transactional
