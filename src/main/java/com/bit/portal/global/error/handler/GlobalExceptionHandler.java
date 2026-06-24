@@ -4,6 +4,7 @@ import com.bit.portal.global.error.code.ErrorCode;
 import com.bit.portal.global.error.exception.BusinessException;
 import com.bit.portal.global.error.exception.ExternalApiException;
 import com.bit.portal.global.error.response.ErrorResponse;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -63,6 +64,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(ErrorCode.METHOD_NOT_ALLOWED.getStatus())
                 .body(ErrorResponse.of(ErrorCode.METHOD_NOT_ALLOWED));
+    }
+
+    /** CB OPEN — fallback에서 처리되지 않은 경우 안전망 */
+    @ExceptionHandler(CallNotPermittedException.class)
+    public ResponseEntity<ErrorResponse> handleCircuitBreakerOpen(CallNotPermittedException e) {
+        log.warn("CircuitBreaker OPEN (safety net): {}", e.getMessage());
+        return ResponseEntity
+                .status(ErrorCode.EXTERNAL_API_UNAVAILABLE.getStatus())
+                .body(ErrorResponse.of(ErrorCode.EXTERNAL_API_UNAVAILABLE));
     }
 
     /** 예상치 못한 모든 예외 */
