@@ -28,7 +28,8 @@
       <div v-if="loading" class="text-sm text-gray-400">불러오는 중...</div>
 
       <div v-else class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <table class="w-full text-sm">
+        <div class="overflow-x-auto">
+        <table class="w-full text-sm min-w-[640px]">
           <thead class="bg-gray-50 border-b border-gray-200">
             <tr>
               <th class="th">사번</th>
@@ -63,6 +64,7 @@
           </tbody>
         </table>
         <p v-if="employees.length === 0" class="text-center text-sm text-gray-400 py-10">직원이 없습니다.</p>
+        </div>
       </div>
 
       <!-- 페이지네이션 -->

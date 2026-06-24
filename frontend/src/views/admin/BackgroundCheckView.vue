@@ -52,7 +52,8 @@
         <div v-if="historyLoading" class="text-sm text-gray-400">불러오는 중...</div>
 
         <template v-else-if="history.length > 0">
-          <table class="w-full text-sm">
+          <div class="overflow-x-auto">
+          <table class="w-full text-sm min-w-[520px]">
             <thead class="bg-gray-50">
               <tr>
                 <th class="th">Check ID</th>
@@ -73,6 +74,7 @@
               </tr>
             </tbody>
           </table>
+          </div>
         </template>
         <p v-else-if="historySearched" class="text-sm text-gray-400 text-center py-6">조회 이력이 없습니다.</p>
 
