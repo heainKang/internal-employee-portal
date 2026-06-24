@@ -1,0 +1,10 @@
+.git/
+.github/
+.gradle/
+build/
+.idea/
+.vscode/
+*.md
+deploy/
+nginx/
+src/test/

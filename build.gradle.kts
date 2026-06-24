@@ -56,3 +56,12 @@ dependencies {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+// bootJar 출력 파일명 고정 (plain jar 비활성화)
+tasks.bootJar {
+    archiveFileName.set("app.jar")
+}
+
+tasks.jar {
+    enabled = false
+}

@@ -28,10 +28,6 @@ jobs:
       - name: Build JAR (테스트 제외)
         run: gradle bootJar -x test
 
-      # 배포 파일명 고정 (버전 접미사 제거)
-      - name: Rename JAR
-        run: mv build/libs/$(ls build/libs | grep -v plain) build/libs/app.jar
-
       - name: Copy JAR to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
