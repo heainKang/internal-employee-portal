@@ -49,36 +49,9 @@
           </div>
         </div>
 
-        <!-- 개인 연락처 카드 -->
-        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-          <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">개인 연락처</h3>
-          <div class="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <p class="text-gray-500 mb-0.5">전화번호</p>
-              <p class="font-medium text-gray-900">{{ profile.phone || '-' }}</p>
-            </div>
-            <div>
-              <p class="text-gray-500 mb-0.5">주소</p>
-              <p class="font-medium text-gray-900">{{ profile.address || '-' }}</p>
-            </div>
-            <div>
-              <p class="text-gray-500 mb-0.5">비상연락처 이름</p>
-              <p class="font-medium text-gray-900">{{ profile.emergencyContactName || '-' }}</p>
-            </div>
-            <div>
-              <p class="text-gray-500 mb-0.5">비상연락처 전화번호</p>
-              <p class="font-medium text-gray-900">{{ profile.emergencyContactPhone || '-' }}</p>
-            </div>
-            <div class="col-span-2">
-              <p class="text-gray-500 mb-0.5">메모</p>
-              <p class="font-medium text-gray-900 whitespace-pre-wrap">{{ profile.note || '-' }}</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- 수정 폼 -->
+        <!-- 개인 연락처 + 수정 통합 카드 -->
         <div class="bg-white rounded-xl border border-gray-200 p-6">
-          <h3 class="text-sm font-semibold text-gray-700 mb-4">정보 수정</h3>
+          <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">개인 연락처</h3>
           <form @submit.prevent="handleUpdate" class="space-y-4">
             <div class="grid grid-cols-2 gap-4">
               <div>
@@ -89,9 +62,6 @@
                 <label class="label">주소</label>
                 <input v-model="form.address" type="text" placeholder="서울시 강남구..." class="input" />
               </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
               <div>
                 <label class="label">비상연락처 이름</label>
                 <input v-model="form.emergencyContactName" type="text" placeholder="홍길동" class="input" />
@@ -101,15 +71,13 @@
                 <input v-model="form.emergencyContactPhone" type="text" placeholder="010-0000-0000" class="input" />
               </div>
             </div>
-
             <div>
               <label class="label">메모</label>
               <textarea v-model="form.note" rows="3"
                 placeholder="자기소개, 특이사항 등 자유롭게 작성하세요."
                 class="input resize-none" />
             </div>
-
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3 pt-1">
               <button type="submit" :disabled="saving"
                 class="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white text-sm font-medium rounded-lg transition-colors">
                 {{ saving ? '저장 중...' : '저장' }}
