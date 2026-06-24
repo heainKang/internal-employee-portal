@@ -1,0 +1,21 @@
+[Unit]
+Description=Internal Employee Portal API Server
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/opt/portal
+ExecStart=/usr/bin/java -jar /opt/portal/app.jar
+EnvironmentFile=/opt/portal/.env
+Restart=on-failure
+RestartSec=10
+SuccessExitStatus=143
+TimeoutStopSec=30
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=portal
+
+[Install]
+WantedBy=multi-user.target
