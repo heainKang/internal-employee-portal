@@ -35,8 +35,8 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
 
-    // MSSQL
-    runtimeOnly("com.microsoft.sqlserver:mssql-jdbc")
+    // PostgreSQL
+    runtimeOnly("org.postgresql:postgresql")
 
     // Resilience4j (CircuitBreaker)
     implementation("io.github.resilience4j:resilience4j-spring-boot3:2.2.0")
