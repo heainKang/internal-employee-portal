@@ -21,9 +21,19 @@ public class DataInitializer implements ApplicationRunner {
     @Value("${app.admin.initial-password}")
     private String adminPassword;
 
+    @Value("${app.test.seed-employees:false}")
+    private boolean seedTestEmployees;
+
+    @Value("${app.test.seed-password:Test1234!}")
+    private String seedPassword;
+
     @Override
     public void run(ApplicationArguments args) {
         employeeService.createInitialAdmin(adminEmail, adminPassword);
         log.info("DataInitializer: admin account ready [{}]", adminEmail);
+
+        if (seedTestEmployees) {
+            employeeService.createTestEmployees(seedPassword);
+        }
     }
 }

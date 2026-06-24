@@ -29,6 +29,9 @@ app:
   admin:
     initial-email: ${ADMIN_INITIAL_EMAIL:admin@bit.com}
     initial-password: ${ADMIN_INITIAL_PASSWORD}
+  test:
+    seed-employees: ${SEED_EMPLOYEES:false}
+    seed-password:  ${SEED_PASSWORD:Test1234!}
 
 resilience4j:
   circuitbreaker:

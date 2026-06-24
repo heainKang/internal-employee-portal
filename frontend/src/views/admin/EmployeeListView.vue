@@ -102,7 +102,7 @@ const totalPages = ref(0)
 const totalElements = ref(0)
 const sortBy = ref('createdAt')
 const direction = ref('desc')
-const PAGE_SIZE = 20
+const PAGE_SIZE = 10
 
 const pageNumbers = computed(() => {
   const start = Math.max(0, currentPage.value - 2)
