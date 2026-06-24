@@ -44,6 +44,8 @@ resilience4j:
         permitted-number-of-calls-in-half-open-state: 1
         automatic-transition-from-open-to-half-open-enabled: true
         register-health-indicator: true
+        ignore-exceptions:
+          - com.bit.portal.global.error.exception.BusinessException
 
 springdoc:
   api-docs:

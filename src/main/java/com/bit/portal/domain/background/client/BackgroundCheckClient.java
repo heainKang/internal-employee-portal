@@ -2,6 +2,7 @@ package com.bit.portal.domain.background.client;
 
 import com.bit.portal.domain.background.dto.*;
 import com.bit.portal.global.error.code.ErrorCode;
+import com.bit.portal.global.error.exception.BusinessException;
 import com.bit.portal.global.error.exception.ExternalApiException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,7 @@ public class BackgroundCheckClient {
                 .onStatus(HttpStatusCode::is4xxClientError, resp ->
                         resp.bodyToMono(String.class)
                                 .doOnNext(body -> log.warn("Background check 4xx: {}", body))
-                                .flatMap(body -> Mono.error(new ExternalApiException(ErrorCode.EXTERNAL_API_ERROR))))
+                                .flatMap(body -> Mono.error(new BusinessException(ErrorCode.EXTERNAL_API_ERROR))))
                 .onStatus(HttpStatusCode::is5xxServerError, resp ->
                         Mono.error(new ExternalApiException(ErrorCode.EXTERNAL_API_ERROR)))
                 .bodyToMono(BackgroundCheckCreatedResponse.class)
@@ -44,7 +45,9 @@ public class BackgroundCheckClient {
                 .uri("/background-checks/{checkId}", checkId)
                 .retrieve()
                 .onStatus(status -> status.value() == 404, resp ->
-                        Mono.error(new ExternalApiException(ErrorCode.BACKGROUND_CHECK_NOT_FOUND)))
+                        Mono.error(new BusinessException(ErrorCode.BACKGROUND_CHECK_NOT_FOUND)))
+                .onStatus(HttpStatusCode::is4xxClientError, resp ->
+                        Mono.error(new BusinessException(ErrorCode.EXTERNAL_API_ERROR)))
                 .onStatus(HttpStatusCode::is5xxServerError, resp ->
                         Mono.error(new ExternalApiException(ErrorCode.EXTERNAL_API_ERROR)))
                 .bodyToMono(BackgroundCheckResultResponse.class)
@@ -61,7 +64,7 @@ public class BackgroundCheckClient {
                         .build())
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, resp ->
-                        Mono.error(new ExternalApiException(ErrorCode.EXTERNAL_API_ERROR)))
+                        Mono.error(new BusinessException(ErrorCode.EXTERNAL_API_ERROR)))
                 .onStatus(HttpStatusCode::is5xxServerError, resp ->
                         Mono.error(new ExternalApiException(ErrorCode.EXTERNAL_API_ERROR)))
                 .bodyToMono(BackgroundCheckListResponse.class)
