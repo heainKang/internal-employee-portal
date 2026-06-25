@@ -18,7 +18,7 @@
 | Framework | Spring Boot 3.x |
 | Security | Spring Security 6 + JWT (jjwt) |
 | ORM | Spring Data JPA + Hibernate |
-| Database | MSSQL (Microsoft SQL Server) |
+| Database | PostgreSQL 16 |
 | Build Tool | Gradle (Kotlin DSL) |
 | API Docs | SpringDoc OpenAPI 3 (Swagger UI) |
 | HTTP Client | Spring WebFlux WebClient |
@@ -101,6 +101,7 @@ PATCH  /api/me                                      # 내 정보 수정 (ROLE_US
 POST   /api/admin/employees                         # 직원 계정 생성 (ROLE_ADMIN)
 GET    /api/admin/employees                         # 전체 직원 목록 (ROLE_ADMIN)
 GET    /api/admin/employees/{id}                    # 직원 상세 조회 (ROLE_ADMIN)
+PATCH  /api/admin/employees/{id}                    # 직원 정보 수정 — 부서·직책·권한 (ROLE_ADMIN)
 PATCH  /api/admin/employees/{id}/status             # 직원 상태 변경 / 퇴사 처리 (ROLE_ADMIN)
 
 POST   /api/admin/background-checks                 # 배경 조회 요청 (ROLE_ADMIN)
@@ -146,7 +147,7 @@ GET    /api/admin/background-checks?employeeId=...  # 직원별 조회 이력 (R
 | 공통 | C001~C005 | 입력값 오류, 인증, 권한, 404, 서버 오류 |
 | 인증/보안 | A001~A004 | 토큰 오류, 만료, 비밀번호 불일치, 계정 비활성화 |
 | 직원 | E001~E003 | 직원 없음, 이메일 중복, 퇴사자 접근 |
-| 외부 API | X001~X004 | 서비스 불가, 타임아웃, API 오류, 결과 없음 |
+| 외부 API | X001~X005 | 서비스 불가, 타임아웃, API 오류, 결과 없음, CB OPEN |
 
 ---
 
@@ -169,12 +170,15 @@ GET    /api/admin/background-checks?employeeId=...  # 직원별 조회 이력 (R
 ```
 [BackgroundCheckClient]
   → WebClient (connectionTimeout: 3s, readTimeout: 10s)
-  → Resilience4j CircuitBreaker
-      - failureRateThreshold: 50%
-      - waitDurationInOpenState: 30s
+  → Resilience4j CircuitBreaker — 3개 독립 인스턴스
+      ├── bgCheck-create  (쓰기: 실패 50% → OPEN 30s, 탐침 1회)
+      ├── bgCheck-get     (읽기: 실패 50% → OPEN 20s, 탐침 2회)
+      └── bgCheck-list    (읽기: 실패 50% → OPEN 20s, 탐침 2회)
       - slidingWindowSize: 5 (최근 5회 중 절반 이상 실패 시 OPEN)
-  → OPEN 상태 시 fallback: ExternalApiException(EXTERNAL_API_UNAVAILABLE)
-  → GlobalExceptionHandler → 503 응답 반환
+      - ignore-exceptions: BusinessException (4xx는 실패 집계 제외)
+  → OPEN 상태 → CallNotPermittedException → X005 / 503
+  → 5xx / 타임아웃 → ExternalApiException → X001~X003 / 502~504
+  → GlobalExceptionHandler → 일관된 JSON 응답
 ```
 
 ---
@@ -254,6 +258,6 @@ security: JWT tokenVersion 이중 잠금 퇴사자 차단 구현
 ## 배포 환경
 
 - **서버:** AWS EC2 + Nginx (리버스 프록시)
-- **DB:** MSSQL
-- **포트:** Spring Boot 8080 → Nginx 80/443 프록시
-- **프론트:** Vue.js (별도 서버 또는 Nginx static 서빙)
+- **DB:** PostgreSQL 16 (Docker 컨테이너)
+- **포트:** Spring Boot 8080 → Nginx 80 프록시
+- **프론트:** Vue.js SPA — Nginx에서 정적 서빙 (`/opt/portal/frontend`)
